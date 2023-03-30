@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addition Fluency Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .problem {
+            font-size: 24px;
+        }
+        .numbers {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .number {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #timer {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="problem" id="problem"></div>
+    <div class="numbers" id="numbers"></div>
+    <div id="timer"></div>
+    <script>
+        const problemEl = document.getElementById('problem');
+        const numbersEl = document.getElementById('numbers');
+        const timerEl = document.getElementById('timer');
+
+        let problems = [];
+        let currentProblem = 0;
+        let correctAnswers = 0;
+        let startTime;
+        let timerInterval;
+
+        function createProblems() {
+            for (let i = 0; i < 40; i++) {
+                let num1 = Math.floor(Math.random() * 11);
+                let num2 = Math.min(20 - num1, Math.floor(Math.random() * 11));
+                problems.push({ num1, num2, correct: num1 + num2 });
+            }
+        }
+
+        function displayProblem() {
+            let { num1, num2 } = problems[currentProblem];
+            problemEl.textContent = `${num1} + ${num2} = `;
+        }
+
+        function createNumberButtons() {
+            for (let i = 0; i <= 20; i++) {
+                let button = document.createElement('div');
+                button.className = 'number';
+                button.textContent = i;
+                button.addEventListener('click', () => checkAnswer(i));
+                numbersEl.appendChild(button);
+            }
+        }
+
+        function checkAnswer(answer) {
+            if (answer === problems[currentProblem].correct) {
+                correctAnswers++;
+            }
+            currentProblem++;
+            if (currentProblem < 40) {
+                displayProblem();
+            } else {
+                clearInterval(timerInterval);
+                displaySummary();
+            }
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let minutes = Math.floor(elapsed / 60000);
+                let seconds = Math.floor((elapsed % 60000) / 1000);
+                timerEl.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function displaySummary() {
+            problemEl.textContent = `You answered ${correctAnswers} out of 40 correctly.`;
+            numbersEl.style.display = 'none';
+            timerEl.style.display = 'none';
+        }
+
+        createProblems();
+        displayProblem();
+        createNumberButtons();
+        startTimer();
+    </script>
+</body>
+</html>
